@@ -1,6 +1,7 @@
 "use client"
 import React, {useState, useEffect} from "react";
 import { addDoc, collection } from "firebase/firestore";
+import {db} from './firebaseconfig'
 
 export default function Home() {
   // Setting state variables
@@ -24,8 +25,15 @@ export default function Home() {
     e.preventDefault();
     // addItem function in which an empty string will not accept onChange
     if (newItem.name !== '' && newItem.price !== ''){  
-      setItems([...items, newItem]);
+      // setItems([...items, newItem]);
 
+      // Getting started docs from coud firestore , adding await addDoc function.
+      await addDoc(collection(db, 'items'),{
+        name: newItem.name.trim(),
+        price: newItem.price,
+
+      });
+      setNewItem({name: '', price: ''}); //After submitting the input fields get empty
     }
   };
 
