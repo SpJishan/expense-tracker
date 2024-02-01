@@ -1,15 +1,15 @@
 "use client"
 import React, {useState, useEffect} from "react";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, getDoc, query, onSnapshot, querySnapshot, doc } from "firebase/firestore";
 import {db} from './firebaseconfig'
 
 export default function Home() {
   // Setting state variables
   const [items, setItems] = useState([
-    {name: 'Tea', price: 0.2 },
-    {name: 'Coffee', price: 0.2},
-    {name: 'Movie', price: 0.6},
-    {name: 'candy', price: 7.75},
+    // {name: 'Tea', price: 0.2 },
+    // {name: 'Coffee', price: 0.2},
+    // {name: 'Movie', price: 0.6},
+    // {name: 'candy', price: 7.75},
   ]);
 
   // New state variable to store data dynamically
@@ -18,8 +18,7 @@ export default function Home() {
   const [total, setTotal] = useState(0);
 
   
-
-  //Add items to database
+////////////////////////////// Add items to firestore database ///////////////////////////
 
   const addItem = async (e) => {
     e.preventDefault();
@@ -36,6 +35,34 @@ export default function Home() {
       setNewItem({name: '', price: ''}); //After submitting the input fields get empty
     }
   };
+  ////////////////////////////// Read data from firestore ///////////////////////////////
+  //Read data from firestore , we will use query, onSnapshot, querySnapshot firebase functions. In this case we will use useEffect
+  //query-checks a data, 
+  //onSnapshot-realtime listener.An initial call using the callback you provide creates a document snapshot immediately with the current contents of the single document. Then, each time the contents change, another call updates the document snapshot. ,
+  //querySnapshot-A QuerySnapshot contains zero or more DocumentSnapshot objects representing the results of a query. The documents can be accessed as an array via the docs property or enumerated using the forEach method. The number of documents can be determined via the empty and size properties.
+  ///////////////////////////////////////////////////////////////////////////////////////
+  useEffect(()=>{
+    const q = query(collection(db, 'items'));
+    const unsubscribe = onSnapshot(q,(querySnapshot) =>{
+      let itemsArr = [];
+
+      querySnapshot.forEach( (doc) => { 
+        itemsArr.push({...doc.data(), id: doc.id}) //pushing each entry to the array with data and id 
+
+       });
+       setItems(itemsArr); //retrieving from firebase and displays data
+      // Read total from items
+      const calculateTotal = () => {
+        const total= itemsArr.reduce( (sum, item) => sum + parseFloat(item.price), 0  );
+        setTotal(total);
+      };
+      calculateTotal();
+      return () => unsubscribe();
+      
+    } );
+  },[]);
+
+  
 
 
   return (
@@ -71,7 +98,9 @@ export default function Home() {
                 <span className="capitalize">{item.name}</span>
                 <span>$ {item.price}</span>
               </div>
-              <button className="ml-8 p-4 border-l-2 border-slate-950 hover:bg-slate-950 w-16">X</button>
+              <button 
+              
+              className="ml-8 p-4 border-l-2 border-slate-950 hover:bg-slate-950 w-16">X</button>
             </li>
           ))}
         </ul>
@@ -80,7 +109,7 @@ export default function Home() {
         {items.length < 1 ? (''):(
           <div className="text-white flex justify-between p-3">
             <span>Total </span>
-            <span>$ {total}</span>
+            <span> {total} in      USD     </span>
           </div>
         )}
       </div>
