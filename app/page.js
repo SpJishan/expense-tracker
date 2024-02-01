@@ -1,6 +1,6 @@
 "use client"
 import React, {useState, useEffect} from "react";
-import { addDoc, collection, getDoc, query, onSnapshot, querySnapshot, doc } from "firebase/firestore";
+import { addDoc, collection, getDoc, query, onSnapshot, querySnapshot, doc, deleteDoc  } from "firebase/firestore";
 import {db} from './firebaseconfig'
 
 export default function Home() {
@@ -62,8 +62,13 @@ export default function Home() {
     } );
   },[]);
 
-  
-
+    ////////////////////////////// Delete data from firestore ////////////////////////////
+    // const deleteItem =async (id) => {
+    //   await deleteDoc(doc(db, 'items', id));
+    // };
+    const deleteItem = async (id) => {
+      await deleteDoc(doc(db, 'items', id));
+    };
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between sm:p-24 p-1">
@@ -99,7 +104,7 @@ export default function Home() {
                 <span>$ {item.price}</span>
               </div>
               <button 
-              
+              onClick={()=> deleteItem(item.id)}
               className="ml-8 p-4 border-l-2 border-slate-950 hover:bg-slate-950 w-16">X</button>
             </li>
           ))}
