@@ -15,6 +15,7 @@ export default function Image(){
         const imgRef =  ref(imageDb,`files/${v4()}`)
         uploadBytes(imgRef,img).then(value=>{
             console.log(value)
+            alert("Image Uploaded");
             getDownloadURL(value.ref).then(url=>{
                 setImgUrl(data=>[...data,url])
             })
